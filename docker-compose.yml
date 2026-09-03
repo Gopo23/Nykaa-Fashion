@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: nykaa_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS:-password}
+      POSTGRES_DB: ${DB_NAME:-postgres}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database_setup.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: nykaa_api
+    command: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASS=${DB_PASS:-password}
+      - DB_NAME=${DB_NAME:-postgres}
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/app
+
+  dashboard:
+    build: .
+    container_name: nykaa_dashboard
+    command: streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    volumes:
+      - .:/app
+
+  redis:
+    image: redis:alpine
+    container_name: nykaa_redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
