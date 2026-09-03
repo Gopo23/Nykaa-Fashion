@@ -19,6 +19,20 @@ load_dotenv()
 
 app = FastAPI(title="Nykaa Fashion AI Discovery Engine API - Real Data")
 
+# CORS Middleware — allows the Vercel frontend to call this API
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://nykaa-fashion.vercel.app",  # Production Vercel URL (update after first deploy)
+        "http://localhost:5173",               # Local Vite dev server
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Database connection settings
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = os.environ.get("DB_PORT", "5432")

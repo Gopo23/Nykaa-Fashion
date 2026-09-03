@@ -44,9 +44,12 @@ async function loadView(path) {
   updateActiveNav(path);
 }
 
+// API Base URL — injected by Vercel via VITE_API_URL, defaults to localhost for dev
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 async function fetchDashboardKPIs() {
   try {
-    const res = await fetch('http://localhost:8000/api/v2/kpis?days=30');
+    const res = await fetch(`${API_BASE}/api/v2/kpis?days=30`);
     if (res.ok) {
       const data = await res.json();
       console.log('Live KPIs from API:', data);
