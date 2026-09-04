@@ -2,10 +2,10 @@ import './style.css'
 
 // The router
 const routes = {
-  'overview': '/src/views/overview.html',
-  'action-queue': '/src/views/action-queue.html',
-  'impact-simulator': '/src/views/impact-simulator.html',
-  'category-deep-dive': '/src/views/category-deep-dive.html'
+  'overview': '/views/overview.html',
+  'action-queue': '/views/action-queue.html',
+  'impact-simulator': '/views/impact-simulator.html',
+  'category-deep-dive': '/views/category-deep-dive.html'
 };
 
 async function loadView(path) {
