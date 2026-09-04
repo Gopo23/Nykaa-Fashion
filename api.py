@@ -45,8 +45,10 @@ client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
 try:
-    redis_client = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
+    redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
+    redis_client.ping()  # Verify the connection actually works
 except Exception:
     redis_client = None
 
@@ -113,6 +115,12 @@ def build_where_clause(days: int, source: str = "All", category: str = "All"):
         params.append(category)
         
     return where, params
+
+# --- Health Check (Railway needs this to confirm the app is alive) ---
+
+@app.get("/")
+def health_check():
+    return {"status": "ok", "service": "Nykaa Fashion API"}
 
 # --- Endpoints for Real Data Dashboard ---
 
